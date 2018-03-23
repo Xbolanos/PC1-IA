@@ -286,9 +286,9 @@ Salida: un string definiendo si la persona es alfabeta o no
 
 def is_literate_pct(age_range, province, canton):
     if age_range == "18-24":
-        return float(datos[province]["propiedades"][canton][11])
+        return float(datos[province]["propiedades"][canton][11])/100
     else:
-        return float(datos[province]["propiedades"][canton][12])
+        return float(datos[province]["propiedades"][canton][12])/100
 
 
 '''
@@ -301,9 +301,9 @@ Salida: un string definiendo si la persona asistio a educacion regular
 
 def regular_edu_pct(age_range, province, canton):
     if age_range == "18-24":
-        return float(datos[province]["propiedades"][canton][19])
+        return float(datos[province]["propiedades"][canton][19])/100
     else:
-        return float(datos[province]["propiedades"][canton][20])
+        return float(datos[province]["propiedades"][canton][20])/100
 
 
 '''
@@ -317,14 +317,13 @@ Salida: probabilidad de pertenecer
 
 
 def get_work_pct(gender, province, canton):
-    part_pct = float(datos[province]["propiedades"][canton][22])/100
 
     if gender == "HOMBRE":
         part_pct_male = float(datos[province]["propiedades"][canton][23])/100
-        return part_pct * part_pct_male
+        return part_pct_male
     else:
         part_pct_female = float(datos[province]["propiedades"][canton][24])/100
-        return part_pct * part_pct_female
+        return part_pct_female
 
 
 '''
@@ -449,28 +448,28 @@ def generate_sample_by_province(province, canton):
         [crowded_pct, not_crowded_pct]
     )
 
-    born_abroad_pct = float(datos[province]["propiedades"][canton][25]) / 100
+    born_abroad_pct = float(datos[province]["propiedades"][canton][26]) / 100
     not_born_abroad_pct = 1-born_abroad_pct
     born_abroad = random_pick(
         ["EXTRANJERO", "NACIONAL"],
         [born_abroad_pct, not_born_abroad_pct]
     )
 
-    handicapped_pct = float(datos[province]["propiedades"][canton][26]) / 100
+    handicapped_pct = float(datos[province]["propiedades"][canton][27]) / 100
     not_handicapped_pct = 1-handicapped_pct
     handicapped = random_pick(
         ["DISCAPACITADO", "NO DISCAPACITADO"],
         [handicapped_pct, not_handicapped_pct]
     )
 
-    female_head_pct = float(datos[province]["propiedades"][canton][28]) / 100
+    female_head_pct = float(datos[province]["propiedades"][canton][29]) / 100
     not_female_head_pct = 1-female_head_pct
     female_head = random_pick(
         ["SI", "NO"],
         [female_head_pct, not_female_head_pct]
     )
 
-    shared_head_pct = float(datos[province]["propiedades"][canton][29]) / 100
+    shared_head_pct = float(datos[province]["propiedades"][canton][30]) / 100
     not_shared_head_pct = 1-shared_head_pct
     shared_head = random_pick(
         ["SI", "NO"],
@@ -544,6 +543,13 @@ def generar_muestra_provincia(n, nombre_provincia):
     return muestras
 
 
+'''
+Retorna un csv con todas las muestras que se le pasen por parametro
+Entrada: una lista de listas con cada muestra
+Salida: un csv con todas las muestras
+'''
+
+
 def pasar_a_csv(muestras):
 
     import csv
@@ -554,6 +560,171 @@ def pasar_a_csv(muestras):
 
         for muestra in muestras:
             writer.writerow(muestra)
+
+
+def porcentajes(muestras):
+    total_urbano = 0
+    total_rural = 0
+    total_hombres = 0
+    total_mujeres = 0
+    total_dependientes = 0
+    total_independientes = 0
+    total_buen_estado = 0
+    total_mal_estado = 0
+    total_hacinadas = 0
+    total_no_hacinadas = 0
+    total_alfabetas = 0
+    total_no_alfabetas = 0
+    total_ed_regular = 0
+    total_no_ed_regular = 0
+    total_trabajando = 0
+    total_no_trabajando = 0
+    total_mujeres_tjo = 0
+    total_hombres_tjo = 0
+    total_asegurado = 0
+    total_no_asegurado = 0
+    total_no_ago_con_tjo = 0
+    total_extranjero = 0
+    total_nacional = 0
+    total_discapacitado = 0
+    total_no_discap = 0
+    total_jef_femenina = 0
+    total_jef_compartida = 0
+
+    for muestra in muestras:
+        if muestra[5] == "URBANO":
+            total_urbano += 1
+        else:
+            total_rural += 1
+
+        if muestra[6] == "MUJER":
+            total_mujeres += 1
+        else:
+            total_hombres += 1
+
+        if muestra[8] == "PRODUCTIVO":
+            total_independientes += 1
+        else:
+            total_dependientes += 1
+
+        if muestra[16] == "BUEN ESTADO":
+            total_buen_estado += 1
+        else:
+            total_mal_estado += 1
+
+        if muestra[17] == "HACINADA":
+            total_hacinadas += 1
+        else:
+            total_no_hacinadas += 1
+
+        if muestra[9] == "ALFABETA":
+            total_alfabetas += 1
+        else:
+            total_no_alfabetas += 1
+
+        if muestra[11] == "SI":
+            total_ed_regular += 1
+        else:
+            total_no_ed_regular += 1
+
+        if muestra[12] == "SI":
+            total_trabajando += 1
+            if muestra[6] == "MUJER":
+                total_mujeres_tjo += 1
+            else:
+                total_hombres_tjo += 1
+        else:
+            total_no_trabajando += 1
+
+        if muestra[13] == "SI":
+            total_asegurado += 1
+        else:
+            total_no_asegurado += 1
+            if muestra[12] == "SI":
+                total_no_ago_con_tjo += 1
+
+        if muestra[18] == "EXTRANJERO":
+            total_extranjero += 1
+        else:
+            total_nacional += 1
+
+        if muestra[19] == "DISCAPACITADO":
+            total_discapacitado += 1
+        else:
+            total_no_discap += 1
+
+        if muestra[20] == "SI":
+            total_jef_femenina += 1
+
+        if muestra[21] == "SI":
+            total_jef_compartida += 1
+
+    pct_urbano = total_urbano/(total_urbano+total_rural)
+    pct_genero_fem = total_mujeres/(total_mujeres+total_hombres)
+    pct_depend = total_dependientes/(total_dependientes+total_independientes)
+    pct_estado = total_buen_estado/(total_buen_estado+total_mal_estado)
+    pct_hac = total_hacinadas/(total_hacinadas+total_no_hacinadas)
+    pct_alfabeta = total_alfabetas/(total_alfabetas+total_no_alfabetas)
+    pct_ed_regular = total_ed_regular/(total_ed_regular+total_no_ed_regular)
+    pct_trabajando = total_trabajando/(total_trabajando+total_no_trabajando)
+    pct_mujeres_tjo = total_mujeres_tjo/total_trabajando
+    pct_hombres_tjo = total_hombres_tjo/total_trabajando
+    pct_no_asegurado = total_no_asegurado/(total_no_asegurado+total_asegurado)
+    pct_no_ago_con_tjo = total_no_ago_con_tjo/total_trabajando
+    pct_extranjero = total_extranjero/(total_extranjero+total_nacional)
+    pct_discap = total_discapacitado/(total_discapacitado+total_no_discap)
+    pct_jef_fem = total_jef_femenina/len(muestras)
+    pct_jef_comp = total_jef_compartida/len(muestras)
+
+    return (
+        pct_urbano, pct_genero_fem, pct_depend, pct_estado, pct_hac,
+        pct_alfabeta, pct_ed_regular, pct_trabajando, pct_mujeres_tjo,
+        pct_hombres_tjo, pct_no_asegurado, pct_no_ago_con_tjo, pct_extranjero,
+        pct_discap, pct_jef_fem, pct_jef_comp
+    )
+
+
+def sacar_promedios(muestras):
+    promedios = {
+        "POBLACION URBANA": 0,
+        "MUJERES": 0,
+        "HOMBRES": 0,
+        "DEPENDIENTES": 0,
+        "VIVIENDAS BE": 0,
+        "VIVIENDAS H": 0,
+        "ALFABETISMO": 0,
+        "EDUCACION RE": 0,
+        "TRABAJO": 0,
+        "TRABAJO M": 0,
+        "TRABAJO H": 0,
+        "NO ASEGURADO": 0,
+        "NO ASEGURADO CON TRABAJO": 0,
+        "EXTRANJERO": 0,
+        "DISCAPACIDAD": 0,
+        "JEFATURA F": 0,
+        "JEFATURA C": 0
+    }
+
+    pcts = porcentajes(muestras)
+    promedios["POBLACION URBANA"] = pcts[0]
+    promedios["MUJERES"] = pcts[1]
+    promedios["HOMBRES"] = 1-pcts[1]
+    promedios["DEPENDIENTES"] = pcts[2]
+    promedios["VIVIENDAS BE"] = pcts[3]
+    promedios["VIVIENDAS H"] = pcts[4]
+    promedios["ALFABETISMO"] = pcts[5]
+    promedios["EDUCACION RE"] = pcts[6]
+    promedios["TRABAJO"] = pcts[7]
+    promedios["TRABAJO M"] = pcts[8]
+    promedios["TRABAJO H"] = pcts[9]
+    promedios["NO ASEGURADO"] = pcts[10]
+    promedios["NO ASEGURADO CON TRABAJO"] = pcts[11]
+    promedios["EXTRANJERO"] = pcts[12]
+    promedios["DISCAPACIDAD"] = pcts[13]
+    promedios["JEFATURA F"] = pcts[14]
+    promedios["JEFATURA C"] = pcts[15]
+
+    return promedios
 
 
 def main():
@@ -568,6 +739,7 @@ def main():
     ]
 
     muestras = generar_muestra_pais(100000)
+    # print(sacar_promedios(muestras))
     muestras = [indicadores] + muestras
     pasar_a_csv(muestras)
 
