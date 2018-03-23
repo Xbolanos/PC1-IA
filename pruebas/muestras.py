@@ -226,6 +226,7 @@ def pick_canton(province="NONE"):
 
     else:
         total_votes = votes_quantity_by_province(province)
+        print(total_votes)
 
         probs = []
         cantons = []
@@ -233,6 +234,49 @@ def pick_canton(province="NONE"):
         probs_by_province(total_votes, province, probs, cantons)
 
         return random_pick(cantons, probs)
+
+
+def search_province_by_canton(canton):
+    for province_name in datos:
+        for canton_name in datos[province_name]["votos"]:
+            if canton_name == canton:
+                return province_name
+    return -1
+
+
+def generate_sample_by_province(province, canton):
+    sample = []
+    canton = pick_canton()
+    province = search_province_by_canton(canton)
+    total_population = datos[province]["propiedades"][canton][0]
+    surface = datos[province]["propiedades"][canton][1]
+    density = datos[province]["propiedades"][canton][2]
+
+    urban_pct = float(datos[province]["propiedades"][canton][3]) / 100
+    rural_pct = 1-urban_pct
+    urban = random_pick(["URBANO", "RURAL"], [urban_pct, rural_pct])
+
+    males_relation = float(datos[province]["propiedades"][canton][4])
+    male_pct = males_relation / (males_relation + 100)
+    female_pct = 1-male_pct
+    gender = random_pick(["HOMBRE", "MUJER"], [male_pct, female_pct])
+
+    sample += [
+        province, canton, total_population, surface, density, urban,
+        gender
+    ]
+
+    return sample
+
+
+def generate_sample(province="NONE"):
+    if province == "NONE":
+        canton = pick_canton()
+        province = search_province_by_canton(canton)
+        return generate_sample_by_province(province, canton)
+    else:
+        canton = pick_canton(province)
+        return generate_sample_by_province(province, canton)
 
 
 '''
@@ -246,7 +290,7 @@ def generar_muestra_pais(n):
     cargar_csv()
 
     for muestra in range(0, n):
-        pass
+        print(generate_sample())
 
 
 '''
@@ -264,8 +308,7 @@ def generar_muestra_provincia(n, nombre_provincia):
 
 def main():
     cargar_csv()
-    votes_quantity_by_province("SAN JOSE")
-    # pick_canton()
+    generar_muestra_pais(5)
 
 
 if __name__ == '__main__':
