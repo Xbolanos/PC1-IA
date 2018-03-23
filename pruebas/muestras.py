@@ -252,6 +252,98 @@ def search_province_by_canton(canton):
 
 
 '''
+Retorna un rango de edad para una muestra
+'''
+
+
+def pick_age():
+    age_delimiters = ["18-24", "25-64", "65 O MAS"]
+    probabilities = [611228/2859287, 1935410/2859287, 312649/2859287]
+
+    return random_pick(age_delimiters, probabilities)
+
+
+'''
+Retorna si la persona es depediente o no
+Entrada: rango de edad (string, ver pick_age)
+Salida: un string definiendo si la persona es dependiente o no
+'''
+
+
+def is_dependent(age_range):
+    if age_range == "65 O MAS":
+        return "DEPENDIENTE"
+    else:
+        return "PRODUCTIVO"
+
+
+'''
+Retorna si la persona es alfabeta o no
+Entrada: rango de edad (string, ver pick_age)
+Salida: un string definiendo si la persona es alfabeta o no
+'''
+
+
+def is_literate_pct(age_range, province, canton):
+    if age_range == "18-24":
+        return float(datos[province]["propiedades"][canton][11])
+    else:
+        return float(datos[province]["propiedades"][canton][12])
+
+
+'''
+Retorna el porcentaje de asistencia a educacion regular de la persona promedio
+        de dicha propiedades
+Entrada: rango de edad (string, ver pick_age)
+Salida: un string definiendo si la persona asistio a educacion regular
+'''
+
+
+def regular_edu_pct(age_range, province, canton):
+    if age_range == "18-24":
+        return float(datos[province]["propiedades"][canton][19])
+    else:
+        return float(datos[province]["propiedades"][canton][20])
+
+
+'''
+Retorna la probabilidad de que una persona segun su genero pertenezca o no al
+        grupo laboral
+Entrada: genero de la persona
+         nombre de la provincia
+         nombre del canton
+Salida: probabilidad de pertenecer
+'''
+
+
+def get_work_pct(gender, province, canton):
+    part_pct = float(datos[province]["propiedades"][canton][22])/100
+
+    if gender == "HOMBRE":
+        part_pct_male = float(datos[province]["propiedades"][canton][23])/100
+        return part_pct * part_pct_male
+    else:
+        part_pct_female = float(datos[province]["propiedades"][canton][24])/100
+        return part_pct * part_pct_female
+
+
+'''
+Retorna el porcentaje de una persona que esta asegurada o no
+Entrada: si la persona trabaja o no
+         el nombre de la provincia
+         el nombre del canton
+Salida: probabilidad de estar asegurado
+'''
+
+
+def get_insured_pct(work, province, canton):
+    if work == "SI":
+        return 1 - (float(datos[province]["propiedades"][canton][25]) / 100)
+    else:
+        return 1 - (float(datos[province]["propiedades"][canton][28]) / 100)
+
+
+'''
 Retorna una muestra de una provincia y canton particulares
 Entrada: nombre de la provincias
          nombre del canton
@@ -261,27 +353,65 @@ Salida: una lista con los datos de la muestra
 
 def generate_sample_by_province(province, canton):
     sample = []
-    canton = pick_canton()
-    province = search_province_by_canton(canton)
+
     total_population = datos[province]["propiedades"][canton][0]
     surface = datos[province]["propiedades"][canton][1]
     density = datos[province]["propiedades"][canton][2]
 
     urban_pct = float(datos[province]["propiedades"][canton][3]) / 100
     rural_pct = 1-urban_pct
-    urban = random_pick(["URBANO", "RURAL"], [urban_pct, rural_pct])
+    urban = random_pick(
+        ["URBANO", "RURAL"],
+        [urban_pct, rural_pct]
+    )
 
     males_relation = float(datos[province]["propiedades"][canton][4])
     male_pct = males_relation / (males_relation + 100)
     female_pct = 1-male_pct
-    gender = random_pick(["HOMBRE", "MUJER"], [male_pct, female_pct])
+    gender = random_pick(
+        ["HOMBRE", "MUJER"],
+        [male_pct, female_pct]
+    )
+
+    age = pick_age()
+    dependent = is_dependent(age)
+
+    literate_pct = is_literate_pct(age, province, canton)
+    not_literate_pct = 1-literate_pct
+    literate = random_pick(
+        ["ALFABETA", "NO ALFABETA"],
+        [literate_pct, not_literate_pct]
+    )
+
+    avg_scholarship = datos[province]["propiedades"][canton][13]
+
+    regular_pct = regular_edu_pct(age, province, canton)
+    not_regular_edu_pct = 1-regular_pct
+    regular_edu = random_pick(
+        ["SI", "NO"],
+        [regular_pct, not_regular_edu_pct]
+    )
+
+    work_pct = get_work_pct(gender, province, canton)
+    not_work_pct = 1-work_pct
+    work = random_pick(
+        ["SI", "NO"],
+        [work_pct, not_work_pct]
+    )
+
+    insured_pct = get_insured_pct(work, province, canton)
+    not_insured_pct = 1-insured_pct
+    insured = random_pick(
+        ["SI", "NO"],
+        [insured_pct, not_insured_pct]
+    )
 
     individual_houses = datos[province]["propiedades"][canton][6]
     occupants_avg = datos[province]["propiedades"][canton][7]
 
     good_condition_pct = float(datos[province]["propiedades"][canton][8]) / 100
     bad_condition_pct = 1-good_condition_pct
-    good_condition = random_pick(
+    condition = random_pick(
         ["BUEN ESTADO", "MAL ESTADO"],
         [good_condition_pct, bad_condition_pct]
     )
@@ -323,7 +453,8 @@ def generate_sample_by_province(province, canton):
 
     sample += [
         province, canton, total_population, surface, density, urban,
-        gender, individual_houses, occupants_avg, good_condition, crowded,
+        gender, age, dependent, literate, avg_scholarship, regular_edu, work,
+        insured, individual_houses, occupants_avg, condition, crowded,
         born_abroad, handicapped, female_head, shared_head
     ]
 
@@ -357,9 +488,12 @@ Salida: lista con las muestras
 
 def generar_muestra_pais(n):
     cargar_csv()
+    muestras = []
 
     for muestra in range(0, n):
-        print(generate_sample())
+        muestras += [generate_sample()]
+
+    return muestras
 
 
 '''
@@ -373,10 +507,40 @@ Salida: lista con las muestras
 
 def generar_muestra_provincia(n, nombre_provincia):
     cargar_csv()
+    muestras = []
+
+    for muestra in range(0, n):
+        muestras += [generate_sample(nombre_provincia)]
+
+    return muestras
+
+
+def pasar_a_csv(muestras):
+
+    import csv
+
+    with open("./pruebas/muestras.csv", "w", newline='') as file:
+
+        writer = csv.writer(file, delimiter=",")
+
+        for muestra in muestras:
+            writer.writerow(muestra)
 
 
 def main():
-    generar_muestra_pais(5)
+    indicadores = [
+        "Provincia", "Canton", "Total de la población", "Superficie",
+        "Densidad de la población", "Urbano/Rural", "Género", "Edad",
+        "Dependencia", "Alfabeta", "Escolaridad promedio",
+        "Escolaridad regular", "Trabaja", "Asegurado",
+        "Cant. casas individuales", "Ocupantes promedio", "Condicion",
+        "Hacinada", "Nacido en...", "Discapacitado", "Jefatura femenina",
+        "Jefatura compartida"
+    ]
+
+    muestras = generar_muestra_pais(5)
+    muestras = [indicadores] + muestras
+    pasar_a_csv(muestras)
 
 
 if __name__ == '__main__':
