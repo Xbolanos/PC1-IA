@@ -3,9 +3,9 @@
 Variables globales
 """
 
-ARCHIVO_CENSOS = "./pruebas/properties.csv"
+ARCHIVO_CENSOS = "./properties.csv"
 
-ARCHIVO_VOTOS = "./pruebas/minutes.csv"
+ARCHIVO_VOTOS = "./minutes.csv"
 
 votos = []
 
@@ -534,6 +534,7 @@ Salida: lista con las muestras
 
 
 def generar_muestra_provincia(n, nombre_provincia):
+    nombre_provincia = nombre_provincia.upper()
     cargar_csv()
     muestras = []
 
@@ -547,7 +548,7 @@ def pasar_a_csv(muestras):
 
     import csv
 
-    with open("./pruebas/muestras.csv", "w", newline='') as file:
+    with open("./muestras.csv", "w", newline='') as file:
 
         writer = csv.writer(file, delimiter=",")
 
