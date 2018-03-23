@@ -13,25 +13,39 @@ censos = []
 
 datos = {
     "SAN JOSE": {
-        "rango": [1, 20]
+        "rango": [1, 20],
+        "votos": {},
+        "propiedades": {}
     },
     "ALAJUELA": {
-        "rango": [21, 35]
+        "rango": [21, 35],
+        "votos": {},
+        "propiedades": {}
     },
     "CARTAGO": {
-        "rango": [36, 43]
+        "rango": [36, 43],
+        "votos": {},
+        "propiedades": {}
     },
     "HEREDIA": {
-        "rango": [44, 53]
+        "rango": [44, 53],
+        "votos": {},
+        "propiedades": {}
     },
     "GUANACASTE": {
-        "rango": [54, 64]
+        "rango": [54, 64],
+        "votos": {},
+        "propiedades": {}
     },
     "PUNTARENAS": {
-        "rango": [65, 75]
+        "rango": [65, 75],
+        "votos": {},
+        "propiedades": {}
     },
     "LIMON": {
-        "rango": [76, 81]
+        "rango": [76, 81],
+        "votos": {},
+        "propiedades": {}
     }
 }
 
@@ -70,16 +84,20 @@ a esta información
 
 
 def cargar_datos():
+
+    global censos
+    global votos
+
     for key in datos:
         primer_canton = datos[key]["rango"][0]
         ultimo_canton = datos[key]["rango"][1]+1
-        votos_en_provincia = []
 
-        for fila in votos:
-            votos_en_provincia += [fila[primer_canton:ultimo_canton]]
-        votos_en_provincia = votos_en_provincia[:17]
-
-        datos[key]["votos"] = votos_en_provincia
+        for fila in range(primer_canton, ultimo_canton):
+            canton = votos[fila][0]
+            votos_en_canton = votos[fila][1:]
+            propiedades_en_canton = censos[fila][1:]
+            datos[key]["votos"][canton] = votos_en_canton
+            datos[key]["propiedades"][canton] = propiedades_en_canton
 
 
 """
@@ -128,8 +146,9 @@ def votes_quantity_by_province(province):
     province_votes = datos[province]["votos"]
     total_votes = 0
 
-    for column in range(len(province_votes[0])):
-        total_votes += int(province_votes[16][column])
+    for key in datos[province]["votos"]:
+        canton = datos[province]["votos"][key]
+        total_votes += int(canton[15])
 
     return total_votes
 
@@ -163,9 +182,10 @@ Salida: lista con probabilidades
 def probs_by_province(total_votes, province, probs, cantons):
     province_cantons = datos[province]["votos"]
 
-    for column in range(len(province_cantons[0])):
-        cantons += [province_cantons[0][column]]
-        probs += [int(province_cantons[16][column])/total_votes]
+    for key in datos[province]["votos"]:
+        canton = datos[province]["votos"][key]
+        cantons += [key]
+        probs += [int(canton[15])/total_votes]
 
 
 '''
@@ -244,7 +264,8 @@ def generar_muestra_provincia(n, nombre_provincia):
 
 def main():
     cargar_csv()
-    pick_canton()
+    votes_quantity_by_province("SAN JOSE")
+    # pick_canton()
 
 
 if __name__ == '__main__':
