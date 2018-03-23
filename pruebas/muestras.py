@@ -344,6 +344,32 @@ def get_insured_pct(work, province, canton):
 
 
 '''
+'''
+
+
+def generated_vote(province, canton):
+
+    total_votes = int(datos[province]["votos"][canton][15])
+    probs = []
+
+    for vote in datos[province]["votos"][canton]:
+        prob = int(vote)/total_votes
+        probs += [prob]
+
+    probs = probs[:15]
+    options = [
+        "ACCESIBILIDAD SIN EXCLUSION", "ACCION CIUDADANA",
+        "ALIANZA DEMOCRATA CRISTIANA", "DE LOS TRABAJADORES", "FRENTE AMPLIO",
+        "INTEGRACION NACIONAL", "LIBERACION NACIONAL", "MOVIMIENTO LIBERTARIO",
+        "NUEVA GENERACION", "RENOVACION COSTARRICENSE",
+        "REPUBLICANO SOCIAL CRISTIANO", "RESTAURACIO NACIONAL",
+        "UNIDAD SOCIAL CRISTIANA", "VOTOS NULO", "VOTOS BLANCO"
+    ]
+
+    return random_pick(options, probs)
+
+
+'''
 Retorna una muestra de una provincia y canton particulares
 Entrada: nombre de la provincias
          nombre del canton
@@ -451,11 +477,13 @@ def generate_sample_by_province(province, canton):
         [shared_head_pct, not_shared_head_pct]
     )
 
+    vote = generated_vote(province, canton)
+
     sample += [
         province, canton, total_population, surface, density, urban,
         gender, age, dependent, literate, avg_scholarship, regular_edu, work,
         insured, individual_houses, occupants_avg, condition, crowded,
-        born_abroad, handicapped, female_head, shared_head
+        born_abroad, handicapped, female_head, shared_head, vote
     ]
 
     return sample
@@ -535,10 +563,10 @@ def main():
         "Escolaridad regular", "Trabaja", "Asegurado",
         "Cant. casas individuales", "Ocupantes promedio", "Condicion",
         "Hacinada", "Nacido en...", "Discapacitado", "Jefatura femenina",
-        "Jefatura compartida"
+        "Jefatura compartida", "Voto"
     ]
 
-    muestras = generar_muestra_pais(5)
+    muestras = generar_muestra_pais(100000)
     muestras = [indicadores] + muestras
     pasar_a_csv(muestras)
 
