@@ -236,12 +236,27 @@ def pick_canton(province="NONE"):
         return random_pick(cantons, probs)
 
 
+'''
+Retorna la provincia a la que pertenece un canton
+Entrada: nombre del canton con el que se busca
+Salida: el nombre de la provincia a la que pertenece
+'''
+
+
 def search_province_by_canton(canton):
     for province_name in datos:
         for canton_name in datos[province_name]["votos"]:
             if canton_name == canton:
                 return province_name
     return -1
+
+
+'''
+Retorna una muestra de una provincia y canton particulares
+Entrada: nombre de la provincias
+         nombre del canton
+Salida: una lista con los datos de la muestra
+'''
 
 
 def generate_sample_by_province(province, canton):
@@ -261,12 +276,66 @@ def generate_sample_by_province(province, canton):
     female_pct = 1-male_pct
     gender = random_pick(["HOMBRE", "MUJER"], [male_pct, female_pct])
 
+    individual_houses = datos[province]["propiedades"][canton][6]
+    occupants_avg = datos[province]["propiedades"][canton][7]
+
+    good_condition_pct = float(datos[province]["propiedades"][canton][8]) / 100
+    bad_condition_pct = 1-good_condition_pct
+    good_condition = random_pick(
+        ["BUEN ESTADO", "MAL ESTADO"],
+        [good_condition_pct, bad_condition_pct]
+    )
+
+    crowded_pct = float(datos[province]["propiedades"][canton][9]) / 100
+    not_crowded_pct = 1-crowded_pct
+    crowded = random_pick(
+        ["HACINADA", "NO HACINADA"],
+        [crowded_pct, not_crowded_pct]
+    )
+
+    born_abroad_pct = float(datos[province]["propiedades"][canton][25]) / 100
+    not_born_abroad_pct = 1-born_abroad_pct
+    born_abroad = random_pick(
+        ["EXTRANJERO", "NACIONAL"],
+        [born_abroad_pct, not_born_abroad_pct]
+    )
+
+    handicapped_pct = float(datos[province]["propiedades"][canton][26]) / 100
+    not_handicapped_pct = 1-handicapped_pct
+    handicapped = random_pick(
+        ["DISCAPACITADO", "NO DISCAPACITADO"],
+        [handicapped_pct, not_handicapped_pct]
+    )
+
+    female_head_pct = float(datos[province]["propiedades"][canton][28]) / 100
+    not_female_head_pct = 1-female_head_pct
+    female_head = random_pick(
+        ["SI", "NO"],
+        [female_head_pct, not_female_head_pct]
+    )
+
+    shared_head_pct = float(datos[province]["propiedades"][canton][29]) / 100
+    not_shared_head_pct = 1-shared_head_pct
+    shared_head = random_pick(
+        ["SI", "NO"],
+        [shared_head_pct, not_shared_head_pct]
+    )
+
     sample += [
         province, canton, total_population, surface, density, urban,
-        gender
+        gender, individual_houses, occupants_avg, good_condition, crowded,
+        born_abroad, handicapped, female_head, shared_head
     ]
 
     return sample
+
+
+'''
+Retorna una muestra ya sea para una provincia y canton particulares o de forma
+aleatoria
+Entrada: nombre de la provincia de la cual generar la muestra (opcional)
+Salida: lista con la muestra generada
+'''
 
 
 def generate_sample(province="NONE"):
@@ -307,7 +376,6 @@ def generar_muestra_provincia(n, nombre_provincia):
 
 
 def main():
-    cargar_csv()
     generar_muestra_pais(5)
 
 
