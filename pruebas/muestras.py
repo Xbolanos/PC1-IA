@@ -101,20 +101,6 @@ def cargar_datos():
 
 
 """
-Calcula probabilidad de hombres por cada 100 mujeres en un cantón
-Entrada: lista
-Salida: float
-"""
-
-
-def calc_prob(canton):
-    total = eval(canton[1])
-    poblacion = eval(canton[5])
-
-    return (poblacion/(poblacion+100))
-
-
-"""
 Retorna elemento aleatorio de una lista con una probabilidad dada
 Entrada: lista con elementos a elegir de manera aleatorio
          lista con probabilidad de cada elemento
@@ -226,7 +212,6 @@ def pick_canton(province="NONE"):
 
     else:
         total_votes = votes_quantity_by_province(province)
-        print(total_votes)
 
         probs = []
         cantons = []
@@ -361,8 +346,8 @@ def generated_vote(province, canton):
         "ALIANZA DEMOCRATA CRISTIANA", "DE LOS TRABAJADORES", "FRENTE AMPLIO",
         "INTEGRACION NACIONAL", "LIBERACION NACIONAL", "MOVIMIENTO LIBERTARIO",
         "NUEVA GENERACION", "RENOVACION COSTARRICENSE",
-        "REPUBLICANO SOCIAL CRISTIANO", "RESTAURACIO NACIONAL",
-        "UNIDAD SOCIAL CRISTIANA", "VOTOS NULO", "VOTOS BLANCO"
+        "REPUBLICANO SOCIAL CRISTIANO", "RESTAURACION NACIONAL",
+        "UNIDAD SOCIAL CRISTIANA", "NULO", "BLANCO"
     ]
 
     return random_pick(options, probs)
@@ -577,10 +562,16 @@ def porcentajes(muestras):
     total_no_alfabetas = 0
     total_ed_regular = 0
     total_no_ed_regular = 0
+    total_ed_18_24 = 0
+    total_no_ed_18_24 = 0
+    total_ed_25_mas = 0
+    total_no_ed_25_mas = 0
     total_trabajando = 0
     total_no_trabajando = 0
     total_mujeres_tjo = 0
+    total_mujeres_no = 0
     total_hombres_tjo = 0
+    total_hombres_no = 0
     total_asegurado = 0
     total_no_asegurado = 0
     total_no_ago_con_tjo = 0
@@ -624,8 +615,16 @@ def porcentajes(muestras):
 
         if muestra[11] == "SI":
             total_ed_regular += 1
+            if muestra[7] == "18-24":
+                total_ed_18_24 += 1
+            else:
+                total_ed_25_mas += 1
         else:
             total_no_ed_regular += 1
+            if muestra[7] == "18-24":
+                total_no_ed_18_24 += 1
+            else:
+                total_no_ed_25_mas += 1
 
         if muestra[12] == "SI":
             total_trabajando += 1
@@ -635,6 +634,10 @@ def porcentajes(muestras):
                 total_hombres_tjo += 1
         else:
             total_no_trabajando += 1
+            if muestra[6] == "MUJER":
+                total_mujeres_no += 1
+            else:
+                total_hombres_no += 1
 
         if muestra[13] == "SI":
             total_asegurado += 1
@@ -667,20 +670,22 @@ def porcentajes(muestras):
     pct_alfabeta = total_alfabetas/(total_alfabetas+total_no_alfabetas)
     pct_ed_regular = total_ed_regular/(total_ed_regular+total_no_ed_regular)
     pct_trabajando = total_trabajando/(total_trabajando+total_no_trabajando)
-    pct_mujeres_tjo = total_mujeres_tjo/total_trabajando
-    pct_hombres_tjo = total_hombres_tjo/total_trabajando
+    pct_mujeres_tjo = total_mujeres_tjo/(total_mujeres_tjo+total_mujeres_no)
+    pct_hombres_tjo = total_hombres_tjo/(total_hombres_tjo+total_hombres_no)
     pct_no_asegurado = total_no_asegurado/(total_no_asegurado+total_asegurado)
     pct_no_ago_con_tjo = total_no_ago_con_tjo/total_trabajando
     pct_extranjero = total_extranjero/(total_extranjero+total_nacional)
     pct_discap = total_discapacitado/(total_discapacitado+total_no_discap)
     pct_jef_fem = total_jef_femenina/len(muestras)
     pct_jef_comp = total_jef_compartida/len(muestras)
+    pct_ed_18_24 = total_ed_18_24/(total_ed_18_24+total_no_ed_18_24)
+    pct_ed_25_mas = total_ed_25_mas/(total_ed_25_mas+total_no_ed_25_mas)
 
     return (
         pct_urbano, pct_genero_fem, pct_depend, pct_estado, pct_hac,
         pct_alfabeta, pct_ed_regular, pct_trabajando, pct_mujeres_tjo,
         pct_hombres_tjo, pct_no_asegurado, pct_no_ago_con_tjo, pct_extranjero,
-        pct_discap, pct_jef_fem, pct_jef_comp
+        pct_discap, pct_jef_fem, pct_jef_comp, pct_ed_18_24, pct_ed_25_mas
     )
 
 
@@ -694,6 +699,8 @@ def sacar_promedios(muestras):
         "VIVIENDAS H": 0,
         "ALFABETISMO": 0,
         "EDUCACION RE": 0,
+        "EDUC 18-24": 0,
+        "EDUC 25 MAS": 0,
         "TRABAJO": 0,
         "TRABAJO M": 0,
         "TRABAJO H": 0,
@@ -723,6 +730,8 @@ def sacar_promedios(muestras):
     promedios["DISCAPACIDAD"] = pcts[13]
     promedios["JEFATURA F"] = pcts[14]
     promedios["JEFATURA C"] = pcts[15]
+    promedios["EDUC 18-24"] = pcts[16]
+    promedios["EDUC 25 MAS"] = pcts[17]
 
     return promedios
 
@@ -738,10 +747,11 @@ def main():
         "Jefatura compartida", "Voto"
     ]
 
-    muestras = generar_muestra_pais(100000)
-    # print(sacar_promedios(muestras))
-    muestras = [indicadores] + muestras
-    pasar_a_csv(muestras)
+    # muestras = generar_muestra_pais(100000)
+    muestras = generar_muestra_pais(25000)
+    print(sacar_promedios(muestras))
+    # muestras = [indicadores] + muestras
+    # pasar_a_csv(muestras)
 
 
 if __name__ == '__main__':
