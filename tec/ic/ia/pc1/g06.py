@@ -1,11 +1,13 @@
 
-#!/usr/bin/env python
-# -*- coding: utf-8 -*- 
+# !/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 """
 Variables globales
 """
 import os
+import csv
+import random
 
 ESTA_CARPETA = os.path.dirname(os.path.abspath(__file__))
 
@@ -64,8 +66,6 @@ como listas de listas
 
 def cargar_csv():
 
-    import csv
-
     global censos
     global votos
 
@@ -116,7 +116,6 @@ Salida: elemento aleatorio de la primera lista
 
 
 def random_pick(lista, probabilidad):
-    import random
 
     x = random.uniform(0, 1)
     prob_acumulada = 0.0
@@ -544,8 +543,6 @@ Salida: un csv con todas las muestras
 
 def pasar_a_csv(muestras):
 
-    import csv
-
     with open("./muestras.csv", "w", newline='') as file:
 
         writer = csv.writer(file, delimiter=",")
@@ -754,11 +751,7 @@ def main():
         "Jefatura compartida", "Voto"
     ]
 
-    # muestras = generar_muestra_pais(100000)
     muestras = generar_muestra_pais(25000)
-    print(sacar_promedios(muestras))
-    # muestras = [indicadores] + muestras
-    # pasar_a_csv(muestras)
 
 
 if __name__ == '__main__':
