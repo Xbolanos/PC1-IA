@@ -4,6 +4,13 @@ import sys
 sys.path.append("..")
 from g06 import *
 
+'''
+Esta clase es la encargada de realizar lo que son las pruebas unitarias. Cada 
+función dentro de ella empieza con test_ y le sigue el nombres de 
+la función que se va a evaluar. 
+'''
+
+
 class MyTest(unittest.TestCase):
      cargar_csv()
      def test_random_pick(self):
