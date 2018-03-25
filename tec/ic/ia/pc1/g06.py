@@ -58,6 +58,7 @@ Carga archivos csv a las variables globales "votos" y "censos"
 como listas de listas
 """
 
+
 def cargar_csv():
 
     global censos
@@ -83,6 +84,7 @@ Guarda los datos de votaciones en un diccionario para un mejor acceso
 a esta información
 '''
 
+
 def cargar_datos():
 
     global censos
@@ -107,6 +109,7 @@ Entrada: lista con elementos a elegir de manera aleatorio
 Salida: elemento aleatorio de la primera lista
 """
 
+
 def random_pick(lista, probabilidad):
 
     x = random.uniform(0, 1)
@@ -125,6 +128,7 @@ Entrada: string con el nombre de la provincia
 Salida: total de votos en dicha provincia
 '''
 
+
 def votes_quantity_by_province(province):
     province_votes = datos[province]["votos"]
     total_votes = 0
@@ -139,6 +143,7 @@ def votes_quantity_by_province(province):
 '''
 Retorna la cantidad de votos que hubo en todo el pais
 '''
+
 
 def votes_quatity_general():
     total_votes = 0
@@ -160,6 +165,7 @@ Salida: lista con probabilidades
         lista con cantones
 '''
 
+
 def probs_by_province(total_votes, province, probs, cantons):
     province_cantons = datos[province]["votos"]
 
@@ -179,6 +185,7 @@ Salida: lista con probabilidades
         lista con cantones
 '''
 
+
 def general_probs(total_votes, probs, cantons):
     for key in datos:
         probs_by_province(total_votes, key, probs, cantons)
@@ -190,6 +197,7 @@ Retorna un canton elegido al azar segun su probabilidad de que exista un
 Entrada: El nombre de la provincia a la que pertenece, o por el contrario nada
 Salida: Un canton elegido segun provincia o segun todas las provincias
 '''
+
 
 def pick_canton(province="NONE"):
     if province == "NONE":
@@ -220,6 +228,7 @@ Entrada: nombre del canton con el que se busca
 Salida: el nombre de la provincia a la que pertenece
 '''
 
+
 def search_province_by_canton(canton):
     for province_name in datos:
         for canton_name in datos[province_name]["votos"]:
@@ -231,6 +240,7 @@ def search_province_by_canton(canton):
 '''
 Retorna un rango de edad para una muestra
 '''
+
 
 def pick_age():
     age_delimiters = ["18-24", "25-64", "65 O MAS"]
@@ -245,6 +255,7 @@ Entrada: rango de edad (string, ver pick_age)
 Salida: un string definiendo si la persona es dependiente o no
 '''
 
+
 def is_dependent(age_range):
     if age_range == "65 O MAS":
         return "DEPENDIENTE"
@@ -257,6 +268,7 @@ Retorna si la persona es alfabeta o no
 Entrada: rango de edad (string, ver pick_age)
 Salida: un string definiendo si la persona es alfabeta o no
 '''
+
 
 def is_literate_pct(age_range, province, canton):
     if age_range == "18-24":
@@ -271,6 +283,7 @@ Retorna el porcentaje de asistencia a educacion regular de la persona promedio
 Entrada: rango de edad (string, ver pick_age)
 Salida: un string definiendo si la persona asistio a educacion regular
 '''
+
 
 def regular_edu_pct(age_range, province, canton):
     if age_range == "18-24":
@@ -287,6 +300,7 @@ Entrada: genero de la persona
          nombre del canton
 Salida: probabilidad de pertenecer
 '''
+
 
 def get_work_pct(gender, province, canton):
 
@@ -306,6 +320,7 @@ Entrada: si la persona trabaja o no
 Salida: probabilidad de estar asegurado
 '''
 
+
 def get_insured_pct(work, province, canton):
     if work == "SI":
         return 1 - (float(datos[province]["propiedades"][canton][25]) / 100)
@@ -315,6 +330,7 @@ def get_insured_pct(work, province, canton):
 
 '''
 '''
+
 
 def generated_vote(province, canton):
 
@@ -344,6 +360,7 @@ Entrada: nombre de la provincias
          nombre del canton
 Salida: una lista con los datos de la muestra
 '''
+
 
 def generate_sample_by_province(province, canton):
     sample = []
@@ -464,6 +481,7 @@ Entrada: nombre de la provincia de la cual generar la muestra (opcional)
 Salida: lista con la muestra generada
 '''
 
+
 def generate_sample(province="NONE"):
     if province == "NONE":
         canton = pick_canton()
@@ -479,6 +497,7 @@ Retorna una lista con diferentes muestras de votantes generadas aleatoriamente
 Entrada: cantidad de muestras a generar
 Salida: lista con las muestras
 '''
+
 
 def generar_muestra_pais(n):
     cargar_csv()
@@ -498,6 +517,7 @@ Entrada: cantidad de muestras a generar
 Salida: lista con las muestras
 '''
 
+
 def generar_muestra_provincia(n, nombre_provincia):
     nombre_provincia = nombre_provincia.upper()
     cargar_csv()
@@ -515,6 +535,7 @@ Entrada: una lista de listas con cada muestra
 Salida: un csv con todas las muestras
 '''
 
+
 def pasar_a_csv(muestras):
 
     with open("./muestras.csv", "w", newline='') as file:
@@ -523,6 +544,7 @@ def pasar_a_csv(muestras):
 
         for muestra in muestras:
             writer.writerow(muestra)
+
 
 def porcentajes(muestras):
     total_urbano = 0
@@ -665,6 +687,7 @@ def porcentajes(muestras):
         pct_discap, pct_jef_fem, pct_jef_comp, pct_ed_18_24, pct_ed_25_mas
     )
 
+
 def sacar_promedios(muestras):
     promedios = {
         "POBLACION URBANA": 0,
@@ -710,6 +733,7 @@ def sacar_promedios(muestras):
     promedios["EDUC 25 MAS"] = pcts[17]
 
     return promedios
+
 
 def main():
     indicadores = [
